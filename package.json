@@ -1,0 +1,20 @@
+{
+	"name" : "jellybin",
+	"author" : "bluemir <qa22ahj@gmail.com>",
+	"description" : "lightweight JSONDatabase with automatically syncing to disk",
+	"version" : "0.1.0",
+	"repository" : {
+		"url" : "git://github.com/bluemir/jellybin"
+	},
+	"main" : "jellybin.js",
+	"dependencies" : {},
+	"engines" : {
+		"node" : "*"
+	},
+	"keyword" : [
+		"JSON",
+		"store",
+		"embededDB",
+		"database"
+	]
+}
