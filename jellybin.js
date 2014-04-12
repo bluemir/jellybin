@@ -7,6 +7,8 @@ module.exports = function(path, config){
 }
 
 function JellyBin(path, config){
+	config = config || {};
+
 	this._data = jsonLoadSync(path);
 	this._path = path;
 
@@ -17,10 +19,7 @@ function JellyBin(path, config){
 	if(config.watch !== false){
 		var watcher = fs.watch(path);
 		watcher.on('change', function(event, filename){
-			if(event === "rename"){
-				watcher.close();
-				watcher = fs.watch(path);
-			} else if(event === "change"){
+			if(event === "change"){
 				try {
 					that._data = jsonLoadSync(that._path);
 					//if succese then reset error
@@ -30,7 +29,7 @@ function JellyBin(path, config){
 				}
 			}
 		}).on('error', function(err){
-			this._error = err;
+			that._error = err;
 		});
 	}
 }
@@ -43,9 +42,10 @@ JellyBin.prototype.save = function save(data, callback){
 	jsonSave(this._path, this._data, callback);
 }
 JellyBin.prototype.load = function load(callback){
+	var that = this;
 	jsonLoad(this._path, function(err, data){
 		if(err) return callback(err);
-		this._data = data;
+		that._data = data;
 		callback(null, data);
 	});
 }
