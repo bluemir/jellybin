@@ -2,7 +2,7 @@
 	"name" : "jellybin",
 	"author" : "bluemir <qa22ahj@gmail.com>",
 	"description" : "lightweight JSONDatabase with automatically syncing to disk",
-	"version" : "0.1.1",
+	"version" : "0.1.2",
 	"repository" : {
 		"url" : "git://github.com/bluemir/jellybin"
 	},
