@@ -9,10 +9,20 @@ module.exports = function(path, config){
 function JellyBin(path, config){
 	config = config || {};
 
-	this._data = jsonLoadSync(path);
+	try{
+		this._data = jsonLoadSync(path);
+		this._error = null;
+	} catch(e){
+		if(e.code == "ENOENT" && config.create == true){
+			jsonSaveSync(path, {});
+			this._data = {};
+			this._error = null;
+		} else {
+			this._error = e;
+			throw e;
+		}
+	}
 	this._path = path;
-
-	this._error = null;
 
 	var that = this;
 
@@ -67,7 +77,7 @@ JellyBin.prototype.find = function find(query){
 	if(this._error) throw this._error;
 
 	var result = {};
-	
+
 	var compareFunc = typeof query == "object" ? isCollect : isSame;
 
 	for(var key in this._data){
@@ -106,4 +116,7 @@ function jsonLoadSync(path){
 }
 function jsonSave(path, data, callback){
 	fs.writeFile(path, JSON.stringify(data, null, 4), {encoding : "utf8"}, callback);
+}
+function jsonSaveSync(path, data){
+	return fs.writeFileSync(path, JSON.stringify(data, null, 4), {encoding : "utf8"});
 }
