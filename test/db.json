@@ -1,0 +1,8 @@
+{
+    "name": "jellybin",
+    "repo": "git@github.com:bluemir/jellybin",
+    "info": {
+        "testtool": "mocha",
+        "other": "testing"
+    }
+}

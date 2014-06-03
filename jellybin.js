@@ -10,12 +10,12 @@ function JellyBin(path, config){
 	config = config || {};
 
 	try{
-		this._data = jsonLoadSync(path);
+		this.json = jsonLoadSync(path);
 		this._error = null;
 	} catch(e){
 		if(e.code == "ENOENT" && config.create == true){
 			jsonSaveSync(path, {});
-			this._data = {};
+			this.json = {};
 			this._error = null;
 		} else {
 			this._error = e;
@@ -31,7 +31,7 @@ function JellyBin(path, config){
 		watcher.on('change', function(event, filename){
 			if(event === "change"){
 				try {
-					that._data = jsonLoadSync(that._path);
+					that.json = jsonLoadSync(that._path);
 					//if succese then reset error
 					that._error = null;
 				} catch(e) {
@@ -41,6 +41,7 @@ function JellyBin(path, config){
 		}).on('error', function(err){
 			that._error = err;
 		});
+		this._watcher = watcher;
 	}
 }
 
@@ -48,14 +49,14 @@ JellyBin.prototype.save = function save(data, callback){
 	if(typeof data != "object") {
 		return callback(new Error("data must be object"));
 	}
-	this._data = data;
-	jsonSave(this._path, this._data, callback);
+	this.json = data;
+	jsonSave(this._path, this.json, callback);
 }
 JellyBin.prototype.load = function load(callback){
 	var that = this;
 	jsonLoad(this._path, function(err, data){
 		if(err) return callback(err);
-		that._data = data;
+		that.json = data;
 		callback(null, data);
 	});
 }
@@ -63,14 +64,14 @@ JellyBin.prototype.set = function put(key, value, callback){
 	//trigger when reload fail
 	if(this._error) throw this._error;
 
-	this._data[key] = value;
-	jsonSave(this._path, this._data, callback);
+	this.json[key] = value;
+	jsonSave(this._path, this.json, callback);
 }
 JellyBin.prototype.get = function get(key){
 	//trigger when reload fail
 	if(this._error) throw this._error;
 
-	return this._data[key];
+	return this.json[key];
 }
 JellyBin.prototype.find = function find(query){
 	//trigger when reload fail
@@ -80,9 +81,9 @@ JellyBin.prototype.find = function find(query){
 
 	var compareFunc = typeof query == "object" ? isCollect : isSame;
 
-	for(var key in this._data){
-		if(compareFunc(this._data[key], query)){
-			result[key] = this._data[key];
+	for(var key in this.json){
+		if(compareFunc(this.json[key], query)){
+			result[key] = this.json[key];
 		}
 	}
 	return result;
@@ -95,9 +96,13 @@ JellyBin.prototype.find = function find(query){
 		}
 		return true;
 	}
-	function isSame(element, query){
+	function isSame(value, query){
 		return value === query;
 	}
+}
+JellyBin.prototype.unwatch = function(){
+	if(this._watcher)
+		this._watcher.close();
 }
 
 function jsonLoad(path, callback){
